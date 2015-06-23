@@ -32,7 +32,7 @@ namespace ScreenMarquee
             this.Label.Measure(new Size(double.PositiveInfinity, this.Height));
 
             viewModel.Done += this.viewModel_Done;
-            viewModel.Start(fullWidth, -this.Label.DesiredSize.Width, TimeSpan.FromSeconds(3));
+            viewModel.Start(fullWidth + 500, -500 - this.Label.DesiredSize.Width, TimeSpan.FromSeconds(5));
         }
 
         void viewModel_Done(object sender, EventArgs e)
