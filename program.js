@@ -1,4 +1,4 @@
-!function (config, childProcess, linq) {
+!function (config, childProcess, linq, path) {
     'use strict';
 
     var CHANNEL_NAME = 'screenbomb',
@@ -22,7 +22,7 @@
                 return;
             }
 
-            var cp = childProcess.spawn('bin/screenmarquee.exe', [message.text]),
+            var cp = childProcess.spawn(path.resolve(path.dirname(module.filename), 'bin/screenmarquee.exe'), [message.text]),
                 watchdog = setTimeout(function () {
                     cp.kill();
                 }, 10000);
@@ -37,5 +37,6 @@
 }(
     require('./config'),
     require('child_process'),
-    require('async-linq')
+    require('async-linq'),
+    require('path')
 );
