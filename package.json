@@ -1,0 +1,7 @@
+{
+  "name": "cnr-bomberman",
+  "dependencies": {
+    "async-linq": "^1.0.4",
+    "slack-client": "^1.4.1"
+  }
+}
