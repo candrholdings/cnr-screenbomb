@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title>C&amp;R Bomberman</title>
+  <style type="text/css">
+  body {
+    margin: 0;
+    overflow: hidden;
+  }
+
+  #root {
+    background-color: rgba(13, 92, 171, .5);
+    color: White;
+    font-family: 'Segoe UI', 'Helvetica Neue', 'Meiryo', 'Arial Unicode MS', Arial, sans-serif;
+    font-size: 140px;
+    height: 200px;
+    text-shadow: 0 0 20px Black;
+    width: 100%;
+    opacity: 0;
+  }
+
+  #marquee {
+    position: absolute;
+  }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <nobr id="marquee"></nobr>
+  </div>
+  <script type="text/javascript">
+  !function ($, async) {
+    'use strict';
+
+    var VELOCITY = 400;
+
+    window.bomberman = {
+      show: function (message, avatar, callback) {
+        var $root = $('#root'),
+          $marquee = $('#marquee')
+            .empty()
+            .append(
+              $('<img style="width: 96px; height: 96px; margin-right: .3em;" />').attr('src', avatar)
+            )
+            .append(
+              $('<span />').text(message)
+            ),
+          textWidth = $marquee.width(),
+          windowWidth = $(window).width(),
+          travelLength = windowWidth + textWidth,
+          duration = travelLength / VELOCITY;
+
+        async.waterfall([
+          function (callback) {
+            $marquee.css('left', windowWidth);
+
+            setTimeout(function () {
+              callback();
+            }, 0);
+          },
+          function (callback) {
+            $('#root').one('transitionend', function () {
+              callback();
+            }).css({
+              opacity: 1,
+              transition: 'opacity .3s linear'
+            });
+          },
+          function (callback) {
+            $marquee.one('transitionend', function () {
+              callback();
+            }).css({
+              left: -textWidth,
+              transition: 'left ' + duration.toFixed(1) + 's linear'
+            });
+          },
+          function (callback) {
+            $('#root').one('transitionend', function () {
+              setTimeout(function () {
+                callback();
+              }, 500);
+            }).css({
+              opacity: 0,
+              transition: 'opacity .3s linear'
+            });
+          }
+        ], callback);
+      }
+    };
+
+    var ipc = require('ipc');
+
+    ipc.on('message', function (message, avatar) {
+      window.bomberman.show(message, avatar, function () {
+        require('remote').getCurrentWindow().destroy();
+      });
+    });
+  }(require('jquery'), require('async'));
+  </script>
+</body>
+</html>
