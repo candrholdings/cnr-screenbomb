@@ -47,15 +47,26 @@
       .then(slack => {
         const
           dataStore = slack.rtm.dataStore;
+          channel = dataStore.getChannelByName(config.SLACK_CHANNEL_NAME);
+
+        if (!channel) {
+          console.log(`Cannot find Slack channel named ${config.SLACK_CHANNEL_NAME}`);
+          return process.exit(-1);
+        }
+
+        const
+          channelID = channel.id;
+
+        console.info(`Slack channel "${config.SLACK_CHANNEL_NAME}" found with ID "${channelID}"`);
 
         slack.rtm.on('message', message => {
-          if (message.channel[0] !== 'D') { return; }
+          if (!message.subtype && (message.channel[0] === 'D' || message.channel === channelID)) {
+            const
+              user = dataStore.getUserById(message.user),
+              profile = user && user.profile;
 
-          const
-            user = dataStore.getUserById(message.user),
-            profile = user && user.profile;
-
-          showMessage(message.text, profile ? profile.image192 : '');
+            showMessage(message.text, profile ? profile.image192 : '');
+          }
         });
       });
   }
